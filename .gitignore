@@ -1,0 +1,14 @@
+# Variables de entorno y credenciales — nunca subir
+.env
+.env.local
+
+# Dependencias
+node_modules/
+
+# Build
+.next/
+dist/
+build/
+
+# Sistema
+.DS_Store
