@@ -1,11 +1,11 @@
 /**
  * lib/drafting.ts
- * Paso 6: Redacción con Gemini API.
+ * Paso 6: Redacción bilingüe (ES / EN) con Gemini API.
  * 
  * Formato SEOFOMO (SRS §1, §3.4):
- * - Titular claro y directo en español.
- * - Formato: "¿Qué pasó? — ¿Qué significa?" (resumen conciso de impacto práctico para SEO/GEO).
- * - Categorización automática: 'google-updates', 'ai-search', 'seo-strategy', 'technical-seo', 'local-ecommerce'.
+ * - Titular claro y directo en español e inglés.
+ * - Formato: "Qué pasó / What happened" y "Qué significa / Why it matters".
+ * - Categorización técnica: 'google-updates', 'ai-search', 'seo-strategy', 'technical-seo', 'local-ecommerce'.
  */
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getPool, query } from "@/lib/db";
@@ -26,9 +26,17 @@ export interface SelectedGroupForDraft {
 
 export interface DraftedItemOutput {
   topic_group_id: string;
-  headline: string;
-  implication_summary: string;
   category: "google-updates" | "ai-search" | "seo-strategy" | "technical-seo" | "local-ecommerce";
+  es: {
+    headline: string;
+    what_happened: string;
+    why_it_matters: string;
+  };
+  en: {
+    headline: string;
+    what_happened: string;
+    why_it_matters: string;
+  };
 }
 
 function getGeminiModel() {
@@ -47,28 +55,36 @@ function getGeminiModel() {
 }
 
 const SYSTEM_DRAFTING_PROMPT = `
-Eres el redactor jefe de "Project News", una newsletter técnica y directa sobre SEO, GEO e IA Search.
-Tu estilo está inspirado en SEOFOMO: conciso, ultra pragmático, sin relleno comercial ni obviedades. Escribe en un español impecable, natural y profesional para consultores y responsables SEO.
+Eres el redactor jefe de "Project News", una newsletter técnica y directa sobre SEO, GEO e IA Search (estilo SEOFOMO).
+Tu estilo es conciso, pragmático y sin relleno comercial.
 
-Para cada grupo de noticias seleccionado, debes redactar:
-1. **headline**: Un titular claro, informativo y atractivo en español (máx 12-15 palabras).
-2. **implication_summary**: Debe seguir estrictamente la estructura:
-   "**Qué pasó:** [Explicación concisa en 1 frase de la novedad/dato]. **Qué significa:** [1-2 frases explicando la implicación práctica directa para rankings, visibilidad en IA, tráfico o estrategia SEO/GEO]."
-3. **category**: Asigna una de las siguientes categorías exactas:
+Para cada grupo de noticias seleccionado, debes redactar la versión en **ESPAÑOL** y en **INGLÉS**:
+1. **headline**: Titular claro y atractivo (máx 12-15 palabras).
+2. **what_happened**: 1 frase concisa con el hecho/dato objetivo.
+3. **why_it_matters**: 1-2 frases explicando la implicación práctica para rankings, visibilidad en IA, tráfico o estrategia SEO/GEO.
+4. **category**: Asigna una de las siguientes categorías exactas:
    - 'google-updates' (cambios de algoritmo, Search Console, políticas de Google)
    - 'ai-search' (ChatGPT Search, AI Overviews, LLMs, Perplexity, citaciones IA)
    - 'technical-seo' (Schema, rastreo, indexación, Core Web Vitals, arquitectura web)
    - 'seo-strategy' (estudios de datos, presupuestos, link building, contenido)
    - 'local-ecommerce' (Google Maps, Merchant Center, comercio local)
 
-Responde ÚNICAMENTE con un JSON que cumpla esta estructura:
+Responde ÚNICAMENTE con un JSON con esta estructura exacta:
 {
   "drafts": [
     {
       "topic_group_id": "UUID_DEL_GRUPO",
-      "headline": "Titular en español",
-      "implication_summary": "**Qué pasó:** ... **Qué significa:** ...",
-      "category": "ai-search"
+      "category": "ai-search",
+      "es": {
+        "headline": "Titular en español",
+        "what_happened": "Explicación concisa en 1 frase en español.",
+        "why_it_matters": "Implicación práctica en 1-2 frases en español."
+      },
+      "en": {
+        "headline": "Headline in English",
+        "what_happened": "Concise 1-sentence explanation in English.",
+        "why_it_matters": "Practical takeaway in 1-2 sentences in English."
+      }
     }
   ]
 }
@@ -94,7 +110,7 @@ export async function draftSelectedItems(
 
   const prompt = `${SYSTEM_DRAFTING_PROMPT}
 
-Redacta los siguientes temas seleccionados para la edición semanal:
+Redacta en español e inglés los siguientes temas seleccionados para la edición semanal:
 ${JSON.stringify(payload, null, 2)}
 `;
 
@@ -169,7 +185,7 @@ export async function loadSelectedGroups(): Promise<SelectedGroupForDraft[]> {
 }
 
 /**
- * Genera la redacción solo para los grupos seleccionados pendientes y los añade a issue_items
+ * Genera la redacción bilingüe solo para los grupos seleccionados pendientes y los añade a issue_items
  */
 export async function runDraftingPipeline() {
   const pendingSelectedGroups = await loadSelectedGroups();
@@ -180,7 +196,7 @@ export async function runDraftingPipeline() {
 
   const weekId = pendingSelectedGroups[0].week_id;
 
-  console.log(`  ✍️ Redactando ${pendingSelectedGroups.length} noticias nuevas seleccionadas con Gemini...`);
+  console.log(`  ✍️ Redactando ${pendingSelectedGroups.length} noticias nuevas en ES/EN con Gemini...`);
   const drafts = await draftSelectedItems(pendingSelectedGroups);
 
   // Obtener el último sort_order existente para esta edición
@@ -190,23 +206,37 @@ export async function runDraftingPipeline() {
   );
   let currentOrder = maxOrderRows[0]?.max_order ?? 0;
 
-  // Insertar únicamente los nuevos items redactados
+  // Insertar únicamente los nuevos items redactados con soporte bilingüe
   for (const draft of drafts) {
     currentOrder++;
+    const legacySummary = `**Qué pasó:** ${draft.es.what_happened} **Qué significa:** ${draft.es.why_it_matters}`;
+
     await query(
       `INSERT INTO issue_items (
         weekly_issue_id, 
         topic_group_id, 
         headline, 
-        implication_summary, 
+        implication_summary,
+        headline_es,
+        headline_en,
+        what_happened_es,
+        what_happened_en,
+        why_it_matters_es,
+        why_it_matters_en,
         category, 
         sort_order
-      ) VALUES ($1, $2, $3, $4, $5, $6)`,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         weekId,
         draft.topic_group_id,
-        draft.headline,
-        draft.implication_summary,
+        draft.es.headline,
+        legacySummary,
+        draft.es.headline,
+        draft.en.headline,
+        draft.es.what_happened,
+        draft.en.what_happened,
+        draft.es.why_it_matters,
+        draft.en.why_it_matters,
         draft.category,
         currentOrder,
       ]

@@ -76,6 +76,12 @@ export interface Database {
           topic_group_id: string;
           headline: string;
           implication_summary: string;
+          headline_es: string | null;
+          headline_en: string | null;
+          what_happened_es: string | null;
+          what_happened_en: string | null;
+          why_it_matters_es: string | null;
+          why_it_matters_en: string | null;
           category: string | null;
           sort_order: number;
           created_at: string;

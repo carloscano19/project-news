@@ -25,8 +25,12 @@ async function main() {
   // Consultar el resultado final almacenado con fuentes originales y puntuación
   const finalItems = await query<{
     sort_order: number;
-    headline: string;
-    implication_summary: string;
+    headline_es: string;
+    headline_en: string;
+    what_happened_es: string;
+    what_happened_en: string;
+    why_it_matters_es: string;
+    why_it_matters_en: string;
     category: string;
     relevance_score: string;
     sources: string;
@@ -34,8 +38,12 @@ async function main() {
   }>(`
     SELECT 
       ii.sort_order,
-      ii.headline,
-      ii.implication_summary,
+      ii.headline_es,
+      ii.headline_en,
+      ii.what_happened_es,
+      ii.what_happened_en,
+      ii.why_it_matters_es,
+      ii.why_it_matters_en,
       ii.category,
       tg.relevance_score,
       STRING_AGG(DISTINCT s.name, ', ') as sources,
@@ -46,15 +54,19 @@ async function main() {
     JOIN raw_items ri ON ri.id = tgi.raw_item_id
     JOIN sources s ON s.id = ri.source_id
     WHERE ii.weekly_issue_id = $1
-    GROUP BY ii.id, ii.sort_order, ii.headline, ii.implication_summary, ii.category, tg.relevance_score
+    GROUP BY ii.id, ii.sort_order, ii.headline_es, ii.headline_en, ii.what_happened_es, ii.what_happened_en, ii.why_it_matters_es, ii.why_it_matters_en, ii.category, tg.relevance_score
     ORDER BY ii.sort_order ASC
   `, [result.weekId]);
 
   console.log("═".repeat(90));
   for (const item of finalItems) {
     console.log(`\n📌 #${item.sort_order} [${item.category.toUpperCase()}] (Score: ${Number(item.relevance_score).toFixed(1)}/10)`);
-    console.log(`📰 ${item.headline}`);
-    console.log(`💬 ${item.implication_summary}`);
+    console.log(`🇪🇸 [ES] ${item.headline_es}`);
+    console.log(`   📌 ${item.what_happened_es}`);
+    console.log(`   💡 ${item.why_it_matters_es}`);
+    console.log(`🇬🇧 [EN] ${item.headline_en}`);
+    console.log(`   📌 ${item.what_happened_en}`);
+    console.log(`   💡 ${item.why_it_matters_en}`);
     console.log(`🏷️ Fuentes: ${item.sources}`);
     console.log(`🔗 ${item.urls}`);
   }
