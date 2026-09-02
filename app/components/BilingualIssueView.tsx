@@ -34,89 +34,82 @@ type Lang = "es" | "en";
 const UI_DICTIONARY = {
   es: {
     locale: "es-ES",
-    badge: "EDICIÓN SEMANAL",
-    title: "Resumen Semanal SEO, GEO e IA Search",
+    brandTag: "Señal entre ruido",
+    title: "Lo que importa esta semana en SEO, GEO e IA Search",
     subtitle:
-      "Curación automática de alta señal: las noticias y cambios más relevantes de la semana con su impacto práctico directo.",
+      "Curación algorítmica y editorial con filtro estricto de relevancia: descartamos el ruido diario y extraemos solo los cambios con impacto práctico.",
+    edition: "Edición",
     weekOf: "Semana del",
-    previewMode: (count: number) => `Modo Preview (${count} noticias)`,
-    pipelineStatus: "Pipeline de Automatización — Estado",
-    pipelineComplete: "Pipeline Completo (Fase 1)",
-    pipelineSteps: {
-      ingest: "Ingesta RSS (8 fuentes)",
-      group: "Agrupación (59 grupos)",
-      score: "Scoring Gemini (≥ 8.0)",
-      draft: "Redacción Bilingüe",
-    },
-    selectedNews: (count: number) => `Noticias Seleccionadas (${count})`,
-    sortedBy: "Ordenadas por impacto y relevancia",
-    relevance: "Relevancia",
+    pipelineActive: "Pipeline activo",
+    pipelineSummary: (filtered: number, total: number) =>
+      `${total} noticias analizadas → ${filtered} superaron el filtro de señal (≥ 8.0)`,
+    leadStoryBadge: "Noticia principal",
+    signalScore: "Señal",
     whatHappened: "Qué pasó",
     whyItMatters: "Qué significa",
     sources: "Fuentes citadas",
-    readOriginal: "Leer original",
-    empty: "No se han encontrado noticias redactadas para esta edición.",
+    readOriginal: "Leer fuente original",
+    empty: "No hay noticias disponibles para esta edición.",
     errorTitle: "Error al conectar con la base de datos:",
-    footer: "Project News · Pipeline automatizado con Gemini API, Next.js y Supabase.",
+    footer: "Project News · Curación automatizada de alta señal para consultores y líderes de Search.",
     categories: {
       "google-updates": "Actualizaciones de Google",
-      "ai-search": "AI Search & GEO",
-      "technical-seo": "SEO Técnico",
-      "seo-strategy": "Estrategia SEO & Datos",
-      "local-ecommerce": "Local & E-commerce",
+      "ai-search": "IA Search y GEO",
+      "technical-seo": "SEO técnico",
+      "seo-strategy": "Estrategia y datos",
+      "local-ecommerce": "Local y comercio",
     } as Record<string, string>,
   },
   en: {
     locale: "en-US",
-    badge: "WEEKLY ISSUE",
-    title: "SEO, GEO & AI Search Weekly Digest",
+    brandTag: "Signal through noise",
+    title: "What truly matters this week in SEO, GEO & AI Search",
     subtitle:
-      "High-signal automated curation: the week's most impactful news and changes with their direct practical takeaway.",
+      "Algorithmic and editorial curation with a strict relevance threshold: filtering out daily noise to highlight only practical, high-impact developments.",
+    edition: "Issue",
     weekOf: "Week of",
-    previewMode: (count: number) => `Preview Mode (${count} stories)`,
-    pipelineStatus: "Automation Pipeline — Status",
-    pipelineComplete: "Pipeline Complete (Phase 1)",
-    pipelineSteps: {
-      ingest: "RSS Ingestion (8 sources)",
-      group: "Topic Grouping (59 groups)",
-      score: "Gemini Scoring (≥ 8.0)",
-      draft: "Bilingual Drafting",
-    },
-    selectedNews: (count: number) => `Selected Stories (${count})`,
-    sortedBy: "Ranked by impact and relevance",
-    relevance: "Relevance",
+    pipelineActive: "Active pipeline",
+    pipelineSummary: (filtered: number, total: number) =>
+      `${total} articles analyzed → ${filtered} passed the signal threshold (≥ 8.0)`,
+    leadStoryBadge: "Lead story",
+    signalScore: "Signal",
     whatHappened: "What happened",
     whyItMatters: "Why it matters",
     sources: "Cited sources",
-    readOriginal: "Read original",
-    empty: "No stories found for this edition.",
+    readOriginal: "Read original source",
+    empty: "No stories available for this issue.",
     errorTitle: "Database connection error:",
-    footer: "Project News · Automated pipeline with Gemini API, Next.js & Supabase.",
+    footer: "Project News · High-signal automated curation for search leaders and consultants.",
     categories: {
-      "google-updates": "Google Updates",
+      "google-updates": "Google updates",
       "ai-search": "AI Search & GEO",
       "technical-seo": "Technical SEO",
-      "seo-strategy": "SEO Strategy & Data",
-      "local-ecommerce": "Local & E-commerce",
+      "seo-strategy": "Strategy & data",
+      "local-ecommerce": "Local & commerce",
     } as Record<string, string>,
   },
 };
 
-const CATEGORY_STYLES: Record<string, string> = {
-  "google-updates": "bg-blue-100 text-blue-800 border-blue-200",
-  "ai-search": "bg-purple-100 text-purple-800 border-purple-200",
-  "technical-seo": "bg-emerald-100 text-emerald-800 border-emerald-200",
-  "seo-strategy": "bg-amber-100 text-amber-800 border-amber-200",
-  "local-ecommerce": "bg-rose-100 text-rose-800 border-rose-200",
-};
+/**
+ * Calcula la intensidad de color y opacidad proporcional al score (8.0 a 10.0)
+ */
+function getSignalIntensity(score: number) {
+  const normalized = Math.max(0, Math.min(1, (score - 8.0) / (10.0 - 8.0)));
+  // Opacidad entre 0.35 (en el corte 8.0) y 1.0 (en 10.0)
+  const opacity = 0.35 + normalized * 0.65;
+  return {
+    barColor: `rgba(255, 77, 46, ${opacity.toFixed(2)})`,
+    badgeBg: `rgba(255, 77, 46, ${(0.08 + normalized * 0.12).toFixed(2)})`,
+    badgeText: score >= 9.0 ? "#FF4D2E" : `rgba(215, 60, 30, ${Math.max(0.75, opacity)})`,
+    borderGlow: score >= 9.0 ? "shadow-[0_0_12px_rgba(255,77,46,0.25)]" : "",
+    isHighSignal: score >= 9.0,
+  };
+}
 
 export default function BilingualIssueView({ issue, items, error }: Props) {
   const [lang, setLang] = useState<Lang>("es");
-  const [mounted, setMounted] = useState(false);
 
-  // Leer preferencia guardada al montar el componente
   useEffect(() => {
-    setMounted(true);
     const saved = localStorage.getItem("project_news_lang") as Lang | null;
     if (saved === "es" || saved === "en") {
       setLang(saved);
@@ -130,7 +123,6 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
 
   const t = UI_DICTIONARY[lang];
 
-  // Formateo de fecha según locale
   const formattedDate = issue
     ? new Date(issue.week_start_date).toLocaleDateString(t.locale, {
         day: "numeric",
@@ -140,115 +132,93 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
     : "";
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-zinc-900">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-[#0F1115] text-[#F5F3EE] selection:bg-[#FF4D2E] selection:text-white">
+      {/* Contenedor central */}
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         
-        {/* Encabezado Editorial con Selector de Idioma */}
-        <header className="mb-10 pb-8 border-b border-zinc-200">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-900 text-white">
-                  <span>📰 PROJECT NEWS</span>
-                  <span>•</span>
-                  <span>{t.badge}</span>
-                </div>
-
-                {/* Selector de idioma Toggle */}
-                <div className="inline-flex items-center bg-zinc-200 p-0.5 rounded-lg text-xs font-bold shadow-inner">
-                  <button
-                    onClick={() => handleLangChange("es")}
-                    className={`px-2.5 py-1 rounded-md transition-all ${
-                      lang === "es"
-                        ? "bg-white text-zinc-900 shadow-sm"
-                        : "text-zinc-600 hover:text-zinc-900"
-                    }`}
-                    aria-label="Español"
-                  >
-                    🇪🇸 ES
-                  </button>
-                  <button
-                    onClick={() => handleLangChange("en")}
-                    className={`px-2.5 py-1 rounded-md transition-all ${
-                      lang === "en"
-                        ? "bg-white text-zinc-900 shadow-sm"
-                        : "text-zinc-600 hover:text-zinc-900"
-                    }`}
-                    aria-label="English"
-                  >
-                    🇬🇧 EN
-                  </button>
-                </div>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-950">
-                {t.title}
-              </h1>
-              <p className="mt-2 text-base text-zinc-600 leading-relaxed">
-                {t.subtitle}
-              </p>
+        {/* Cabecera Editorial */}
+        <header className="mb-12">
+          {/* Top Bar: Brand + Idioma */}
+          <div className="flex items-center justify-between pb-6 border-b border-[#1F242C]">
+            <div className="flex items-center gap-3">
+              <span className="h-2 w-2 rounded-full bg-[#FF4D2E]" />
+              <span className="font-medium tracking-tight text-sm text-[#F5F3EE]">
+                Project News
+              </span>
+              <span className="text-xs text-[#7C8591]">/</span>
+              <span className="text-xs text-[#7C8591]">{t.brandTag}</span>
             </div>
 
-            {issue && (
-              <div className="sm:text-right shrink-0 bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block mb-1">
-                  {t.weekOf}
+            {/* Selector de idioma ES / EN */}
+            <div className="inline-flex items-center rounded-lg bg-[#181C22] p-1 border border-[#242A34] text-xs font-semibold">
+              <button
+                onClick={() => handleLangChange("es")}
+                className={`px-3 py-1 rounded-md transition-all ${
+                  lang === "es"
+                    ? "bg-[#252C37] text-white shadow-sm font-bold"
+                    : "text-[#7C8591] hover:text-[#F5F3EE]"
+                }`}
+                aria-label="Español"
+              >
+                ES
+              </button>
+              <button
+                onClick={() => handleLangChange("en")}
+                className={`px-3 py-1 rounded-md transition-all ${
+                  lang === "en"
+                    ? "bg-[#252C37] text-white shadow-sm font-bold"
+                    : "text-[#7C8591] hover:text-[#F5F3EE]"
+                }`}
+                aria-label="English"
+              >
+                EN
+              </button>
+            </div>
+          </div>
+
+          {/* Título y subtítulo */}
+          <div className="mt-8">
+            <h1 className="font-editorial text-4xl sm:text-5xl lg:text-[54px] font-normal tracking-tight text-[#F5F3EE] leading-[1.15]">
+              {t.title}
+            </h1>
+            <p className="mt-4 text-base sm:text-lg text-[#7C8591] max-w-3xl leading-relaxed">
+              {t.subtitle}
+            </p>
+          </div>
+
+          {/* Barra de Estado y Metadatos de la Edición */}
+          {issue && (
+            <div className="mt-8 pt-4 pb-4 border-y border-[#1F242C] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#7C8591]">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-[#F5F3EE]">
+                  {t.weekOf} {formattedDate}
                 </span>
-                <span className="text-sm font-semibold text-zinc-800 block capitalize">
-                  {formattedDate}
-                </span>
-                <span className="inline-block mt-2 px-2 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 rounded-md uppercase">
-                  {t.previewMode(items.length)}
+                <span>·</span>
+                <span>
+                  {items.length} {lang === "es" ? "noticias seleccionadas" : "selected stories"}
                 </span>
               </div>
-            )}
-          </div>
+
+              {/* Indicador sutil de pipeline */}
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2ECC71]" />
+                <span>
+                  {t.pipelineSummary(items.length, 63)}
+                </span>
+              </div>
+            </div>
+          )}
         </header>
 
-        {/* Estado del Pipeline */}
-        <section className="mb-10 p-5 rounded-xl border border-zinc-200 bg-white shadow-sm">
-          <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-zinc-400">
-              {t.pipelineStatus}
-            </h2>
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              {t.pipelineComplete}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-zinc-100 text-xs">
-            <div className="flex items-center gap-1.5 text-zinc-700 font-medium">
-              <span className="text-emerald-600 font-bold">✓</span> {t.pipelineSteps.ingest}
-            </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 font-medium">
-              <span className="text-emerald-600 font-bold">✓</span> {t.pipelineSteps.group}
-            </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 font-medium">
-              <span className="text-emerald-600 font-bold">✓</span> {t.pipelineSteps.score}
-            </div>
-            <div className="flex items-center gap-1.5 text-zinc-700 font-medium">
-              <span className="text-emerald-600 font-bold">✓</span> {t.pipelineSteps.draft}
-            </div>
-          </div>
-        </section>
-
-        {/* Listado de Noticias de la Edición */}
+        {/* Listado de Noticias */}
         {items.length > 0 ? (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-zinc-900">
-                {t.selectedNews(items.length)}
-              </h2>
-              <span className="text-xs text-zinc-500">{t.sortedBy}</span>
-            </div>
-
             {items.map((item, index) => {
+              const isLead = index === 0;
+              const intensity = getSignalIntensity(item.relevance_score);
+
               const categoryLabel =
                 t.categories[item.category] || item.category;
-              const categoryBadge =
-                CATEGORY_STYLES[item.category] ||
-                "bg-zinc-100 text-zinc-800 border-zinc-200";
 
               const headline =
                 lang === "en"
@@ -270,77 +240,108 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
               return (
                 <article
                   key={item.id}
-                  className="p-6 rounded-2xl bg-white border border-zinc-200 shadow-sm hover:border-zinc-300 transition-colors"
+                  className={`relative rounded-2xl transition-all overflow-hidden ${
+                    isLead
+                      ? "bg-[#FAF8F5] p-7 sm:p-9 text-[#121417] shadow-xl border border-white/10"
+                      : "bg-[#F5F3EE] p-6 sm:p-8 text-[#121417] shadow-md border border-[#E6E2D8]"
+                  }`}
                 >
-                  {/* Categoría, Puntuación y Orden */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="flex items-center justify-center h-6 w-6 rounded-full bg-zinc-900 text-white text-xs font-bold">
-                        {index + 1}
+                  {/* Barra lateral de intensidad de señal */}
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-1.5"
+                    style={{ backgroundColor: intensity.barColor }}
+                  />
+
+                  {/* Header de la tarjeta: Categoría + Score */}
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xs font-bold text-[#7C8591] tabular-nums">
+                        {String(index + 1).padStart(2, "0")}
                       </span>
-                      <span
-                        className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${categoryBadge}`}
-                      >
+                      <span className="text-xs text-[#7C8591]">·</span>
+                      <span className="text-xs font-semibold text-[#555E68]">
                         {categoryLabel}
                       </span>
+                      {isLead && (
+                        <span className="text-[11px] font-medium bg-[#121417] text-[#FAF8F5] px-2 py-0.5 rounded-full ml-1">
+                          {t.leadStoryBadge}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-1 bg-zinc-100 px-2.5 py-1 rounded-md text-xs font-medium text-zinc-700 border border-zinc-200">
-                      <span>⭐ {t.relevance}:</span>
-                      <span className="font-bold text-zinc-900">
-                        {Number(item.relevance_score).toFixed(1)}/10
+                    {/* Badge de Señal con intensidad */}
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${intensity.borderGlow}`}
+                      style={{
+                        backgroundColor: intensity.badgeBg,
+                        color: intensity.badgeText,
+                      }}
+                    >
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: intensity.barColor }}
+                      />
+                      <span>{Number(item.relevance_score).toFixed(1)}</span>
+                      <span className="font-normal text-[10px] opacity-80">
+                        {t.signalScore}
                       </span>
                     </div>
                   </div>
 
-                  {/* Titular */}
-                  <h3 className="text-xl font-bold tracking-tight text-zinc-900 mb-3">
+                  {/* Titular en serif editorial */}
+                  <h2
+                    className={`font-editorial font-normal tracking-tight text-[#121417] leading-[1.25] mb-5 ${
+                      isLead
+                        ? "text-2xl sm:text-3xl lg:text-[32px]"
+                        : "text-xl sm:text-2xl"
+                    }`}
+                  >
                     {headline}
-                  </h3>
+                  </h2>
 
-                  {/* Resumen "Qué pasó / Qué significa" estructurado */}
-                  <div className="text-sm text-zinc-700 bg-zinc-50 p-4 rounded-xl border border-zinc-100 mb-4 leading-relaxed space-y-2">
+                  {/* Bloque estructurado "Qué pasó / Qué significa" */}
+                  <div className="bg-[#ECE8DF] rounded-xl p-5 mb-5 space-y-3 text-[14px] leading-relaxed text-[#2D333B]">
                     {whatHappened && (
-                      <p>
-                        <span className="font-bold text-zinc-900">
-                          📌 {t.whatHappened}:{" "}
+                      <div>
+                        <span className="font-bold text-[#121417] block mb-0.5">
+                          {t.whatHappened}
                         </span>
-                        {whatHappened}
-                      </p>
+                        <p className="text-[#3A4048]">{whatHappened}</p>
+                      </div>
                     )}
                     {whyItMatters && (
-                      <p>
-                        <span className="font-bold text-zinc-900">
-                          💡 {t.whyItMatters}:{" "}
+                      <div className="pt-2 border-t border-[#DFD9CD]">
+                        <span className="font-bold text-[#121417] block mb-0.5">
+                          {t.whyItMatters}
                         </span>
-                        {whyItMatters}
-                      </p>
+                        <p className="text-[#3A4048]">{whyItMatters}</p>
+                      </div>
                     )}
                   </div>
 
-                  {/* Fuentes originales y enlaces */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-3 border-t border-zinc-100">
-                    <div className="flex items-center gap-1.5 text-zinc-500">
-                      <span className="font-medium text-zinc-700">
-                        {t.sources}:
+                  {/* Pie de tarjeta: Fuentes y enlace original */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#555E68] pt-2 border-t border-[#E5E0D5]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[#7C8591]">{t.sources}:</span>
+                      <span className="font-medium text-[#121417]">
+                        {item.sources}
                       </span>
-                      <span>{item.sources}</span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
                       {urlList.map((url, uIdx) => (
                         <a
                           key={uIdx}
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                          className="inline-flex items-center gap-1 font-medium text-[#121417] hover:text-[#FF4D2E] transition-colors underline underline-offset-4 decoration-[#DFD9CD] hover:decoration-[#FF4D2E]"
                         >
                           <span>
-                            {t.readOriginal}{" "}
-                            {urlList.length > 1 ? `#${uIdx + 1}` : ""}
+                            {t.readOriginal}
+                            {urlList.length > 1 ? ` #${uIdx + 1}` : ""}
                           </span>
-                          <span>↗</span>
+                          <span className="text-[10px]">↗</span>
                         </a>
                       ))}
                     </div>
@@ -350,21 +351,21 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
             })}
           </div>
         ) : error ? (
-          <div className="p-8 text-center bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm">
+          <div className="p-8 text-center bg-[#181C22] rounded-2xl border border-red-900/40 text-red-400 text-sm">
             <p className="font-bold mb-1">{t.errorTitle}</p>
-            <p className="font-mono text-xs text-red-600">{error}</p>
+            <p className="font-mono text-xs text-red-300">{error}</p>
           </div>
         ) : (
-          <div className="p-8 text-center bg-white rounded-xl border border-zinc-200 text-zinc-500">
+          <div className="p-12 text-center bg-[#181C22] rounded-2xl border border-[#242A34] text-[#7C8591]">
             {t.empty}
           </div>
         )}
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-xs text-zinc-400 pb-8">
-          {t.footer}
+        <footer className="mt-16 text-center text-xs text-[#7C8591] pb-10 border-t border-[#1F242C] pt-8">
+          <p>{t.footer}</p>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }
