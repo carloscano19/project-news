@@ -138,6 +138,7 @@ export async function loadSelectedGroups(): Promise<SelectedGroupForDraft[]> {
     JOIN raw_items ri ON ri.id = tgi.raw_item_id
     JOIN sources s ON s.id = ri.source_id
     WHERE tg.status = 'selected'
+      AND tg.id NOT IN (SELECT topic_group_id FROM issue_items)
     ORDER BY tg.relevance_score DESC, tg.created_at DESC
   `);
 
@@ -168,24 +169,30 @@ export async function loadSelectedGroups(): Promise<SelectedGroupForDraft[]> {
 }
 
 /**
- * Genera la redacción de los grupos seleccionados y los guarda en issue_items
+ * Genera la redacción solo para los grupos seleccionados pendientes y los añade a issue_items
  */
 export async function runDraftingPipeline() {
-  const selectedGroups = await loadSelectedGroups();
-  if (selectedGroups.length === 0) {
+  const pendingSelectedGroups = await loadSelectedGroups();
+  if (pendingSelectedGroups.length === 0) {
+    console.log("  ℹ️ No hay noticias seleccionadas pendientes de redactar.");
     return { drafted: 0, items: [] };
   }
 
-  const weekId = selectedGroups[0].week_id;
+  const weekId = pendingSelectedGroups[0].week_id;
 
-  console.log(`  ✍️ Redactando ${selectedGroups.length} noticias seleccionadas con Gemini...`);
-  const drafts = await draftSelectedItems(selectedGroups);
+  console.log(`  ✍️ Redactando ${pendingSelectedGroups.length} noticias nuevas seleccionadas con Gemini...`);
+  const drafts = await draftSelectedItems(pendingSelectedGroups);
 
-  // Limpiar issue_items anteriores para esta edición si se re-ejecuta (idempotente)
-  await query("DELETE FROM issue_items WHERE weekly_issue_id = $1", [weekId]);
+  // Obtener el último sort_order existente para esta edición
+  const maxOrderRows = await query<{ max_order: number | null }>(
+    "SELECT MAX(sort_order) as max_order FROM issue_items WHERE weekly_issue_id = $1",
+    [weekId]
+  );
+  let currentOrder = maxOrderRows[0]?.max_order ?? 0;
 
-  // Insertar en issue_items ordenados por puntuación
-  for (const [index, draft] of drafts.entries()) {
+  // Insertar únicamente los nuevos items redactados
+  for (const draft of drafts) {
+    currentOrder++;
     await query(
       `INSERT INTO issue_items (
         weekly_issue_id, 
@@ -201,7 +208,7 @@ export async function runDraftingPipeline() {
         draft.headline,
         draft.implication_summary,
         draft.category,
-        index + 1,
+        currentOrder,
       ]
     );
   }
