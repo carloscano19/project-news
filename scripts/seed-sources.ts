@@ -22,8 +22,8 @@ const SOURCES = [
     name: "Google Search Central Blog",
     type: "official" as const,
     url: "https://developers.google.com/search/blog",
-    rss_url: null, // ⚠️ No tiene feed RSS público (el blog usa devsite sin feed expuesto)
-    active: false,
+    rss_url: "https://feeds.feedburner.com/blogspot/amDG", // ✅ FeedBurner histórico oficial sigue activo y sirviendo developers.google.com/search/blog
+    active: true,
   },
   {
     name: "OpenAI Blog",
