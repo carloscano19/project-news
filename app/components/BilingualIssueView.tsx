@@ -116,6 +116,8 @@ const UI_DICTIONARY = {
     whyItMatters: "Qué significa",
     sources: "Fuentes citadas",
     readOriginal: "Leer original",
+    downloadInfographic: "Descargar infografía",
+    downloading: "Generando...",
     showingCount: (current: number, total: number) =>
       `Mostrando ${current} de ${total} noticias`,
     empty: "No hay noticias disponibles para esta categoría.",
@@ -145,6 +147,8 @@ const UI_DICTIONARY = {
     whyItMatters: "Why it matters",
     sources: "Cited sources",
     readOriginal: "Read original",
+    downloadInfographic: "Download infographic",
+    downloading: "Generating...",
     showingCount: (current: number, total: number) =>
       `Showing ${current} of ${total} stories`,
     empty: "No stories available for this category.",
@@ -242,30 +246,43 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
               <span className="text-xs text-[#7C8591]">{t.brandTag}</span>
             </div>
 
-            {/* Selector de idioma ES / EN */}
-            <div className="inline-flex items-center rounded-lg bg-[#181C22] p-1 border border-[#242A34] text-xs font-semibold">
-              <button
-                onClick={() => handleLangChange("es")}
-                className={`px-3 py-1 rounded-md transition-all ${
-                  lang === "es"
-                    ? "bg-[#252C37] text-white shadow-sm font-bold"
-                    : "text-[#7C8591] hover:text-[#F5F3EE]"
-                }`}
-                aria-label="Español"
+            {/* Botón de descarga de infografía + Selector de idioma */}
+            <div className="flex items-center gap-3">
+              <a
+                href={`/api/infographic?lang=${lang}`}
+                download={`project-news-infographic-${lang}.png`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181C22] border border-[#242A34] text-xs font-semibold text-[#F5F3EE] hover:bg-[#252C37] hover:border-[#38414E] transition-all shadow-sm group"
+                title={t.downloadInfographic}
               >
-                ES
-              </button>
-              <button
-                onClick={() => handleLangChange("en")}
-                className={`px-3 py-1 rounded-md transition-all ${
-                  lang === "en"
-                    ? "bg-[#252C37] text-white shadow-sm font-bold"
-                    : "text-[#7C8591] hover:text-[#F5F3EE]"
-                }`}
-                aria-label="English"
-              >
-                EN
-              </button>
+                <span className="text-sm transition-transform group-hover:-translate-y-0.5">📥</span>
+                <span>{t.downloadInfographic}</span>
+              </a>
+
+              {/* Selector de idioma ES / EN */}
+              <div className="inline-flex items-center rounded-lg bg-[#181C22] p-1 border border-[#242A34] text-xs font-semibold">
+                <button
+                  onClick={() => handleLangChange("es")}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    lang === "es"
+                      ? "bg-[#252C37] text-white shadow-sm font-bold"
+                      : "text-[#7C8591] hover:text-[#F5F3EE]"
+                  }`}
+                  aria-label="Español"
+                >
+                  ES
+                </button>
+                <button
+                  onClick={() => handleLangChange("en")}
+                  className={`px-3 py-1 rounded-md transition-all ${
+                    lang === "en"
+                      ? "bg-[#252C37] text-white shadow-sm font-bold"
+                      : "text-[#7C8591] hover:text-[#F5F3EE]"
+                  }`}
+                  aria-label="English"
+                >
+                  EN
+                </button>
+              </div>
             </div>
           </div>
 
