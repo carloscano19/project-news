@@ -249,7 +249,7 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
             {/* Botón de descarga de infografía + Selector de idioma */}
             <div className="flex items-center gap-3">
               <a
-                href={`/api/infographic?lang=${lang}&v=3`}
+                href={`/api/infographic?lang=${lang}&v=5`}
                 download={`project-news-infographic-${lang}.png`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181C22] border border-[#242A34] text-xs font-semibold text-[#F5F3EE] hover:bg-[#252C37] hover:border-[#38414E] transition-all shadow-sm group"
                 title={t.downloadInfographic}
