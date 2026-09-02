@@ -1,5 +1,8 @@
 import { query } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface IssueItem extends Record<string, unknown> {
   id: string;
   sort_order: number;
@@ -28,7 +31,8 @@ async function getWeeklyIssueData() {
     `);
 
     if (issues.length === 0) {
-      return { issue: null, items: [] };
+      console.warn("⚠️ getWeeklyIssueData: No se encontraron filas en weekly_issues.");
+      return { issue: null, items: [], error: null };
     }
 
     const currentIssue = issues[0];
@@ -54,13 +58,17 @@ async function getWeeklyIssueData() {
       ORDER BY ii.sort_order ASC
     `, [currentIssue.id]);
 
+    console.log(`✅ getWeeklyIssueData: Cargados ${items.length} items para la edición ${currentIssue.week_start_date}`);
+
     return {
       issue: currentIssue,
       items,
+      error: null,
     };
   } catch (error) {
-    console.error("Error loading weekly issue:", error);
-    return { issue: null, items: [] };
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error("❌ Error en getWeeklyIssueData (Supabase):", errorMsg);
+    return { issue: null, items: [], error: errorMsg };
   }
 }
 
@@ -89,7 +97,7 @@ const CATEGORY_MAP: Record<string, { label: string; badgeClass: string }> = {
 };
 
 export default async function Home() {
-  const { issue, items } = await getWeeklyIssueData();
+  const { issue, items, error } = await getWeeklyIssueData();
 
   return (
     <main className="min-h-screen bg-zinc-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-zinc-900">
@@ -256,6 +264,11 @@ export default async function Home() {
                 </article>
               );
             })}
+          </div>
+        ) : error ? (
+          <div className="p-8 text-center bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm">
+            <p className="font-bold mb-1">Error al conectar con la base de datos:</p>
+            <p className="font-mono text-xs text-red-600">{error}</p>
           </div>
         ) : (
           <div className="p-8 text-center bg-white rounded-xl border border-zinc-200 text-zinc-500">
