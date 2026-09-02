@@ -33,7 +33,7 @@ interface TopItemRow extends Record<string, unknown> {
 }
 interface IssueRow extends Record<string, unknown> {
   id: string;
-  week_start_date: string;
+  week_start_date: string | Date;
 }
 
 /* ───── Colores & etiquetas por categoría ────────────────────────── */
@@ -269,7 +269,11 @@ export async function GET(request: NextRequest) {
     const resvg = new Resvg(svg, { fitTo: { mode: "width", value: W } });
     const pngBuffer = resvg.render().asPng();
 
-    const filename = `project-news-${currentIssue.week_start_date.slice(0, 10)}-${lang}.png`;
+    const weekDateObj = new Date(currentIssue.week_start_date);
+    const dateIso = !isNaN(weekDateObj.getTime())
+      ? weekDateObj.toISOString().slice(0, 10)
+      : "latest";
+    const filename = `project-news-${dateIso}-${lang}.png`;
     return new NextResponse(Buffer.from(pngBuffer), {
       status: 200,
       headers: {
