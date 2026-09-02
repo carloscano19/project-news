@@ -535,7 +535,11 @@ export async function GET(request: NextRequest) {
       headers: {
         "Content-Type": "image/png",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        "CDN-Cache-Control": "no-store",
+        "Vercel-CDN-Cache-Control": "no-store",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
 
