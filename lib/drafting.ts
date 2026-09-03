@@ -211,6 +211,9 @@ export async function loadSelectedGroups(): Promise<SelectedGroupForDraft[]> {
   return Array.from(groupMap.values());
 }
 
+export const MAX_ITEMS_PER_CATEGORY = 4;
+export const MAX_TOTAL_ITEMS_PER_ISSUE = 18;
+
 /**
  * Genera la redacción bilingüe solo para los grupos seleccionados pendientes y los añade a issue_items
  */
@@ -226,6 +229,51 @@ export async function runDraftingPipeline() {
   console.log(`  ✍️ Redactando ${pendingSelectedGroups.length} noticias nuevas en ES/EN con Gemini...`);
   const drafts = await draftSelectedItems(pendingSelectedGroups);
 
+  // Mapa de puntuaciones para ordenar candidatos por relevancia
+  const groupScoreMap = new Map<string, number>();
+  for (const g of pendingSelectedGroups) {
+    groupScoreMap.set(g.topic_group_id, g.relevance_score);
+  }
+
+  // Ordenar borradores por score descendente (los de mayor señal van primero)
+  const sortedDrafts = [...drafts].sort((a, b) => {
+    const scoreA = groupScoreMap.get(a.topic_group_id) ?? 8.0;
+    const scoreB = groupScoreMap.get(b.topic_group_id) ?? 8.0;
+    return scoreB - scoreA;
+  });
+
+  // Consultar conteo actual de items ya existentes en la edición
+  const existingItems = await query<{ category: string }>(
+    "SELECT category FROM issue_items WHERE weekly_issue_id = $1",
+    [weekId]
+  );
+  let totalCount = existingItems.length;
+  const categoryCounts: Record<string, number> = {};
+  for (const item of existingItems) {
+    categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+  }
+
+  // Aplicar regla de diversidad: máx 4 por categoría, máx 18 en total por edición
+  const selectedDrafts: DraftedItemOutput[] = [];
+  for (const draft of sortedDrafts) {
+    if (totalCount >= MAX_TOTAL_ITEMS_PER_ISSUE) {
+      console.log(`  ⏹️ Límite total de la edición alcanzado (${MAX_TOTAL_ITEMS_PER_ISSUE} noticias).`);
+      break;
+    }
+
+    const cat = draft.category;
+    const catCount = categoryCounts[cat] || 0;
+
+    if (catCount >= MAX_ITEMS_PER_CATEGORY) {
+      console.log(`  ⏭️ Omitiendo "${draft.es.headline}": categoría "${cat}" ya alcanzó el cupo de ${MAX_ITEMS_PER_CATEGORY}.`);
+      continue;
+    }
+
+    selectedDrafts.push(draft);
+    categoryCounts[cat] = catCount + 1;
+    totalCount++;
+  }
+
   // Obtener el último sort_order existente para esta edición
   const maxOrderRows = await query<{ max_order: number | null }>(
     "SELECT MAX(sort_order) as max_order FROM issue_items WHERE weekly_issue_id = $1",
@@ -233,8 +281,8 @@ export async function runDraftingPipeline() {
   );
   let currentOrder = maxOrderRows[0]?.max_order ?? 0;
 
-  // Insertar únicamente los nuevos items redactados con soporte bilingüe
-  for (const draft of drafts) {
+  // Insertar únicamente los items seleccionados por diversidad
+  for (const draft of selectedDrafts) {
     currentOrder++;
     const legacySummary = `**Qué pasó:** ${draft.es.what_happened} **Qué significa:** ${draft.es.why_it_matters}`;
 
