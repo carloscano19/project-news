@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 
 export interface IssueItemData extends Record<string, unknown> {
   id: string;
@@ -27,6 +28,11 @@ interface Props {
   issue: WeeklyIssueData | null;
   items: IssueItemData[];
   error: string | null;
+  backLink?: {
+    href: string;
+    label_es: string;
+    label_en: string;
+  };
 }
 
 type Lang = "es" | "en";
@@ -118,6 +124,8 @@ const UI_DICTIONARY = {
     readOriginal: "Leer original",
     downloadInfographic: "Descargar infografía",
     downloading: "Generando...",
+    archiveLink: "Ediciones anteriores",
+    archiveFooterText: "Ver archivo histórico de ediciones",
     showingCount: (current: number, total: number) =>
       `Mostrando ${current} de ${total} noticias`,
     empty: "No hay noticias disponibles para esta categoría.",
@@ -149,6 +157,8 @@ const UI_DICTIONARY = {
     readOriginal: "Read original",
     downloadInfographic: "Download infographic",
     downloading: "Generating...",
+    archiveLink: "Past issues",
+    archiveFooterText: "View historical archive of past editions",
     showingCount: (current: number, total: number) =>
       `Showing ${current} of ${total} stories`,
     empty: "No stories available for this category.",
@@ -178,7 +188,7 @@ function getSignalIntensity(score: number) {
   };
 }
 
-export default function BilingualIssueView({ issue, items, error }: Props) {
+export default function BilingualIssueView({ issue, items, error, backLink }: Props) {
   const [lang, setLang] = useState<Lang>("es");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -239,15 +249,38 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
           <div className="flex items-center justify-between pb-6 border-b border-[#1F242C]">
             <div className="flex items-center gap-3">
               <span className="h-2 w-2 rounded-full bg-[#FF4D2E]" />
-              <span className="font-medium tracking-tight text-sm text-[#F5F3EE]">
+              <Link
+                href="/"
+                className="font-medium tracking-tight text-sm text-[#F5F3EE] hover:text-[#FF4D2E] transition-colors"
+              >
                 Project News
-              </span>
+              </Link>
               <span className="text-xs text-[#7C8591]">/</span>
               <span className="text-xs text-[#7C8591]">{t.brandTag}</span>
             </div>
 
-            {/* Botón de descarga de infografía + Selector de idioma */}
+            {/* Acciones Top: Enlace Archivo/Back + Descarga + Idioma */}
             <div className="flex items-center gap-3">
+              {/* Enlace al archivo o de retorno */}
+              {backLink ? (
+                <Link
+                  href={backLink.href}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181C22] border border-[#242A34] text-xs font-semibold text-[#F5F3EE] hover:bg-[#252C37] hover:border-[#38414E] transition-all shadow-sm"
+                >
+                  <span>{lang === "es" ? backLink.label_es : backLink.label_en}</span>
+                </Link>
+              ) : (
+                <Link
+                  href="/archivo"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#181C22] border border-[#242A34] text-xs font-semibold text-[#F5F3EE] hover:bg-[#252C37] hover:border-[#38414E] transition-all shadow-sm"
+                  title={t.archiveLink}
+                >
+                  <span className="text-xs">📚</span>
+                  <span className="hidden sm:inline">{t.archiveLink}</span>
+                </Link>
+              )}
+
+              {/* Botón de descarga de infografía */}
               <a
                 href={`/api/infographic?lang=${lang}&v=5`}
                 download={`project-news-infographic-${lang}.png`}
@@ -255,7 +288,7 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
                 title={t.downloadInfographic}
               >
                 <span className="text-sm transition-transform group-hover:-translate-y-0.5">📥</span>
-                <span>{t.downloadInfographic}</span>
+                <span className="hidden md:inline">{t.downloadInfographic}</span>
               </a>
 
               {/* Selector de idioma ES / EN */}
@@ -640,8 +673,17 @@ export default function BilingualIssueView({ issue, items, error }: Props) {
         )}
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-xs text-[#7C8591] pb-10 border-t border-[#1F242C] pt-8">
+        <footer className="mt-16 text-center text-xs text-[#7C8591] pb-10 border-t border-[#1F242C] pt-8 space-y-3">
           <p>{t.footer}</p>
+          <div>
+            <Link
+              href="/archivo"
+              className="inline-flex items-center gap-1.5 text-xs text-[#9CA3AF] hover:text-[#FF4D2E] transition-colors underline underline-offset-4 decoration-[#28303C] hover:decoration-[#FF4D2E]"
+            >
+              <span>{t.archiveFooterText}</span>
+              <span className="text-[10px]">↗</span>
+            </Link>
+          </div>
         </footer>
       </div>
     </div>

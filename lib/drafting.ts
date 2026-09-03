@@ -243,6 +243,12 @@ export async function runDraftingPipeline() {
     );
   }
 
+  // Marcar la edición semanal como publicada una vez completada la redacción
+  await query(
+    "UPDATE weekly_issues SET status = 'published' WHERE id = $1",
+    [weekId]
+  );
+
   return {
     weekId,
     drafted: drafts.length,
