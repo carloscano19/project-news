@@ -131,9 +131,9 @@ const UI_DICTIONARY = {
   es: {
     locale: "es-ES",
     brandTag: "Señal entre ruido",
-    title: "Lo que importa esta semana en SEO, GEO e IA Search",
+    title: "Lo que importa esta semana en Search, IA, Data y Paid Media",
     subtitle:
-      "Curación algorítmica y editorial con filtro estricto de relevancia: descartamos el ruido diario y extraemos solo los cambios con impacto práctico.",
+      "Curación algorítmica y editorial con filtro estricto de relevancia: descartamos el ruido diario y extraemos solo los cambios con impacto práctico en orgánico, IA, analítica y medios de pago.",
     weekOf: "Semana del",
     pipelineSummary: (filtered: number, total: number) =>
       `${total} noticias analizadas → ${filtered} superaron el filtro de señal (≥ 8.0)`,
@@ -152,7 +152,7 @@ const UI_DICTIONARY = {
       `Mostrando ${current} de ${total} noticias`,
     empty: "No hay noticias disponibles para esta categoría.",
     errorTitle: "Error al conectar con la base de datos:",
-    footer: "Project News · Curación automatizada de alta señal para consultores y líderes de Search.",
+    footer: "Project News · Curación automatizada de alta señal para consultores y líderes de Search, Data y Paid Media.",
     categories: {
       "google-updates": "Actualizaciones de Google",
       "ai-search": "IA Search y GEO",
@@ -166,9 +166,9 @@ const UI_DICTIONARY = {
   en: {
     locale: "en-US",
     brandTag: "Signal through noise",
-    title: "What truly matters this week in SEO, GEO & AI Search",
+    title: "What truly matters this week in Search, AI, Data & Paid Media",
     subtitle:
-      "Algorithmic and editorial curation with a strict relevance threshold: filtering out daily noise to highlight only practical, high-impact developments.",
+      "Algorithmic and editorial curation with a strict relevance threshold: filtering out daily noise to highlight only practical, high-impact developments across organic, AI, data and paid media.",
     weekOf: "Week of",
     pipelineSummary: (filtered: number, total: number) =>
       `${total} articles analyzed → ${filtered} passed the signal threshold (≥ 8.0)`,
@@ -187,7 +187,7 @@ const UI_DICTIONARY = {
       `Showing ${current} of ${total} stories`,
     empty: "No stories available for this category.",
     errorTitle: "Database connection error:",
-    footer: "Project News · High-signal automated curation for search leaders and consultants.",
+    footer: "Project News · High-signal automated curation for leaders in Search, Data & Paid Media.",
     categories: {
       "google-updates": "Google updates",
       "ai-search": "AI Search & GEO",
@@ -375,13 +375,13 @@ export default function BilingualIssueView({ issue, items, error, backLink }: Pr
             </div>
           )}
 
-          {/* Chips de Filtrado por Categoría */}
+          {/* Chips de Filtrado por Categoría (multilínea con flex-wrap, sin scroll horizontal) */}
           {items.length > 0 && (
-            <nav className="mt-6 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" aria-label="Filtro de categorías">
+            <nav className="mt-6 flex flex-wrap items-center gap-2" aria-label="Filtro de categorías">
               {/* Chip "Todas" */}
               <button
                 onClick={() => setSelectedCategory("all")}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border shrink-0 ${
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                   selectedCategory === "all"
                     ? "bg-[#F5F3EE] text-[#121417] border-[#F5F3EE] shadow-sm font-bold"
                     : "bg-[#181C22] text-[#7C8591] border-[#242A34] hover:text-[#F5F3EE] hover:border-[#38414E]"
@@ -419,14 +419,14 @@ export default function BilingualIssueView({ issue, items, error, backLink }: Pr
                         ? config.activeChipStyle
                         : undefined
                     }
-                    className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border shrink-0 ${
+                    className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                       isSelected
                         ? "shadow-sm font-bold"
                         : "bg-[#181C22] text-[#7C8591] border-[#242A34] hover:text-[#F5F3EE] hover:border-[#38414E]"
                     }`}
                   >
                     <span
-                      className="h-1.5 w-1.5 rounded-full shrink-0"
+                      className="h-1.5 w-1.5 rounded-full"
                       style={{
                         backgroundColor: isSelected ? "#FFFFFF" : config.color,
                       }}

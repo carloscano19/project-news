@@ -16,28 +16,28 @@ const UI_DICTIONARY = {
     brandTag: "Señal entre ruido",
     archiveTitle: "Archivo de Ediciones",
     archiveSubtitle:
-      "Histórico completo de ediciones semanales filtradas y curadas. Consulta las noticias de semanas anteriores.",
+      "Histórico completo de ediciones semanales filtradas y curadas en Search, IA, Data y Paid Media. Consulta las noticias de semanas anteriores.",
     currentIssueLink: "Edición actual",
     weekOf: "Semana del",
     storiesCount: (n: number) => `${n} ${n === 1 ? "noticia filtrada" : "noticias filtradas"}`,
     published: "Publicada",
     viewIssue: "Ver edición completa",
     empty: "No hay ediciones archivadas disponibles en este momento.",
-    footer: "Project News · Archivo histórico de curación automatizada sobre SEO, GEO e IA Search.",
+    footer: "Project News · Archivo histórico de curación automatizada sobre Search, IA, Data y Paid Media.",
   },
   en: {
     locale: "en-US",
     brandTag: "Signal through noise",
     archiveTitle: "Issue Archive",
     archiveSubtitle:
-      "Complete historical record of filtered and curated weekly issues. Browse past editions.",
+      "Complete historical record of filtered and curated weekly issues in Search, AI, Data & Paid Media. Browse past editions.",
     currentIssueLink: "Current issue",
     weekOf: "Week of",
     storiesCount: (n: number) => `${n} ${n === 1 ? "curated story" : "curated stories"}`,
     published: "Published",
     viewIssue: "View full issue",
     empty: "No archived issues available at this time.",
-    footer: "Project News · Historical archive of automated curation for SEO, GEO and AI Search.",
+    footer: "Project News · Historical archive of automated curation for Search, AI, Data and Paid Media.",
   },
 };
 

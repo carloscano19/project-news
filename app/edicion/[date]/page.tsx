@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { date } = await params;
   return {
     title: `Edición del ${date} · Project News`,
-    description: `Noticias curadas de la semana del ${date} en SEO, GEO e IA Search.`,
+    description: `Noticias curadas de la semana del ${date} en Search, IA, Data y Paid Media.`,
   };
 }
 

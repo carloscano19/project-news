@@ -200,13 +200,13 @@ export async function GET(request: NextRequest) {
 
     /* 3 · Textos y localización según idioma */
     const T = {
-      titleMain: lang === "es" ? "Lo más importante en SEO" : "Top Developments in SEO",
-      titleAccent: lang === "es" ? " + IA Search" : " + AI Search",
+      titleMain: lang === "es" ? "Lo más importante en Search, IA" : "Top Developments in Search, AI",
+      titleAccent: lang === "es" ? " · Data & Paid" : " · Data & Paid",
       subtitle: lang === "es"
         ? "Las 8 señales que de verdad marcan esta semana."
-        : "The 8 key stories shaping search this week.",
+        : "The 8 key stories shaping the industry this week.",
       heroTag: (catName: string) => `#1 · ${catName.toUpperCase()}`,
-      footerMain: lang === "es" ? "13 noticias analizadas esta semana" : "13 stories analyzed this week",
+      footerMain: lang === "es" ? "Noticias analizadas con rigor" : "Rigorous editorial curation",
       footerSub: lang === "es" ? "Curación automática, cero ruido" : "Automated curation, zero noise",
       cta: lang === "es" ? "LEER LA EDICIÓN COMPLETA" : "READ THE FULL ISSUE",
     };

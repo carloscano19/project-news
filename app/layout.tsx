@@ -16,9 +16,9 @@ const inter = Inter({
 });
 
 const SITE_URL = "https://project-news-lac.vercel.app";
-const TITLE = "Lo que importa esta semana en SEO, GEO e IA Search · Project News";
+const TITLE = "Lo que importa esta semana en Search, IA, Data y Paid Media · Project News";
 const DESCRIPTION =
-  "Curación algorítmica y editorial con filtro estricto de relevancia: descartamos el ruido diario y extraemos solo los cambios con impacto práctico directo.";
+  "Curación algorítmica y editorial con filtro estricto de relevancia: descartamos el ruido diario y extraemos solo los cambios con impacto práctico en Search, IA, Data y Paid Media.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -31,14 +31,22 @@ export const metadata: Metadata = {
   authors: [{ name: "Project News Editorial" }],
   generator: "Next.js",
   keywords: [
+    "Search",
     "SEO",
     "GEO",
     "Generative Engine Optimization",
     "AI Search",
+    "Google Ads",
+    "Meta Ads",
+    "Paid Media",
+    "Data & Analytics",
+    "Google Analytics 4",
+    "GA4",
+    "Google Tag Manager",
+    "GTM",
     "ChatGPT Search",
     "Google AI Overviews",
     "Search Console",
-    "Algoritmos Google",
   ],
   alternates: {
     canonical: "/",
@@ -56,7 +64,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Project News · Señal entre Ruido · Resumen Semanal SEO, GEO e IA Search",
+        alt: "Project News · Señal entre Ruido · Resumen Semanal Search, IA, Data y Paid Media",
         type: "image/png",
       },
     ],

@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Archivo de Ediciones · Project News",
-  description: "Histórico completo de ediciones semanales curadas sobre SEO, GEO e IA Search.",
+  description: "Histórico completo de ediciones semanales curadas sobre Search, IA, Data y Paid Media.",
 };
 
 export default async function ArchivoPage() {
