@@ -96,7 +96,25 @@ Evalúa los siguientes grupos de noticias:
 ${JSON.stringify(payload, null, 2)}
 `;
 
-  const result = await model.generateContent(prompt);
+  let result;
+  let attempts = 0;
+  while (attempts < 4) {
+    try {
+      attempts++;
+      result = await model.generateContent(prompt);
+      break;
+    } catch (err: unknown) {
+      const is503or429 = err instanceof Error && (err.message.includes("503") || err.message.includes("429") || err.message.includes("high demand"));
+      if (is503or429 && attempts < 4) {
+        console.warn(`  ⚠️ Gemini 503/429 (intento ${attempts}/4). Reintentando en ${attempts * 3}s...`);
+        await new Promise((r) => setTimeout(r, attempts * 3000));
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  if (!result) throw new Error("No se pudo obtener respuesta de Gemini tras varios reintentos");
   const responseText = result.response.text();
   
   let parsed: { results: Array<{ id: string; score: number; reasoning: string }> };
