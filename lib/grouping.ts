@@ -130,14 +130,14 @@ export async function groupRawItems(): Promise<GroupingResult> {
     // 1. Obtener/crear la edición de esta semana
     const weekIssueId = await getOrCreateWeeklyIssue(client);
 
-    // 2. Leer ítems de raw_items de los últimos 7 días aún no agrupados
+    // 2. Leer ítems de raw_items de los últimos 14 días aún no agrupados (margen de seguridad anti-retrasos)
     const { rows: items } = await client.query<RawItemRow>(
       `SELECT ri.id, ri.title, s.name AS source_name, ri.published_at
        FROM raw_items ri
        JOIN sources s ON s.id = ri.source_id
        WHERE (
-           (ri.published_at IS NOT NULL AND ri.published_at >= NOW() - INTERVAL '7 days')
-           OR (ri.published_at IS NULL AND ri.ingested_at >= NOW() - INTERVAL '7 days')
+           (ri.published_at IS NOT NULL AND ri.published_at >= NOW() - INTERVAL '14 days')
+           OR (ri.published_at IS NULL AND ri.ingested_at >= NOW() - INTERVAL '14 days')
          )
          AND ri.id NOT IN (
            SELECT raw_item_id FROM topic_group_items
