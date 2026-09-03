@@ -103,6 +103,28 @@ const CATEGORY_CONFIG: Record<
       borderColor: "#D9943B",
     },
   },
+  "data-analytics": {
+    color: "#1E9BD4", // Azul cian Data & Analytics
+    borderTop: "#1E9BD4",
+    chipBg: "rgba(30, 155, 212, 0.12)",
+    chipText: "#147CAE",
+    activeChipStyle: {
+      backgroundColor: "#1E9BD4",
+      color: "#FFFFFF",
+      borderColor: "#1E9BD4",
+    },
+  },
+  "paid-media": {
+    color: "#D6487E", // Rosa/Magenta Paid Media
+    borderTop: "#D6487E",
+    chipBg: "rgba(214, 72, 126, 0.12)",
+    chipText: "#B32F62",
+    activeChipStyle: {
+      backgroundColor: "#D6487E",
+      color: "#FFFFFF",
+      borderColor: "#D6487E",
+    },
+  },
 };
 
 const UI_DICTIONARY = {
@@ -137,6 +159,8 @@ const UI_DICTIONARY = {
       "technical-seo": "SEO técnico",
       "seo-strategy": "Estrategia y datos",
       "local-ecommerce": "Local y comercio",
+      "data-analytics": "Data y analítica",
+      "paid-media": "Medios de pago",
     } as Record<string, string>,
   },
   en: {
@@ -170,6 +194,8 @@ const UI_DICTIONARY = {
       "technical-seo": "Technical SEO",
       "seo-strategy": "Strategy & data",
       "local-ecommerce": "Local & commerce",
+      "data-analytics": "Data & analytics",
+      "paid-media": "Paid media",
     } as Record<string, string>,
   },
 };

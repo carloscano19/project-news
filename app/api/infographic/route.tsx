@@ -47,6 +47,8 @@ const CATS: Record<
   "technical-seo":   { label_es: "SEO Técnico",       label_en: "Technical SEO",      color: "#2E9B85", pastelBg: "#DFF3EE" },
   "seo-strategy":    { label_es: "Estrategia & Datos", label_en: "Strategy & Data",   color: "#8B6FC7", pastelBg: "#EFE9F9" },
   "local-ecommerce": { label_es: "Local & Comercio",  label_en: "Local & Commerce",   color: "#D9943B", pastelBg: "#FBEEDC" },
+  "data-analytics":  { label_es: "Data & Analítica",   label_en: "Data & Analytics",   color: "#1E9BD4", pastelBg: "#E0F4FC" },
+  "paid-media":      { label_es: "Medios de Pago",     label_en: "Paid Media",         color: "#D6487E", pastelBg: "#FCE9F1" },
 };
 const CAT_DEFAULT = { label_es: "General", label_en: "General", color: "#FF4D2E", pastelBg: "#FFE3DB" };
 
@@ -90,6 +92,19 @@ function getIconSvg(category: string, color: string, size = 18) {
         h("path", { d: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" }),
         h("line", { x1: 3, y1: 6, x2: 21, y2: 6 }),
         h("path", { d: "M16 10a4 4 0 0 1-8 0" })
+      );
+    case "data-analytics":
+      // Icono Database
+      return h("svg", props,
+        h("ellipse", { cx: 12, cy: 5, rx: 9, ry: 3 }),
+        h("path", { d: "M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" }),
+        h("path", { d: "M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" })
+      );
+    case "paid-media":
+      // Icono Megaphone
+      return h("svg", props,
+        h("path", { d: "M3 11l18-5v12L3 14v-3z" }),
+        h("path", { d: "M11.6 16.8a3 3 0 1 1-5.8-1.6" })
       );
     default:
       return h("svg", props,

@@ -26,7 +26,14 @@ export interface SelectedGroupForDraft {
 
 export interface DraftedItemOutput {
   topic_group_id: string;
-  category: "google-updates" | "ai-search" | "seo-strategy" | "technical-seo" | "local-ecommerce";
+  category:
+    | "google-updates"
+    | "ai-search"
+    | "seo-strategy"
+    | "technical-seo"
+    | "local-ecommerce"
+    | "data-analytics"
+    | "paid-media";
   es: {
     headline: string;
     what_happened: string;
@@ -55,19 +62,21 @@ function getGeminiModel() {
 }
 
 const SYSTEM_DRAFTING_PROMPT = `
-Eres el redactor jefe de "Project News", una newsletter técnica y directa sobre SEO, GEO e IA Search (estilo SEOFOMO).
+Eres el redactor jefe de "Project News", una newsletter técnica y directa sobre Search, SEO, GEO, Data & Analytics y Paid Media (estilo SEOFOMO).
 Tu estilo es conciso, pragmático y sin relleno comercial.
 
 Para cada grupo de noticias seleccionado, debes redactar la versión en **ESPAÑOL** y en **INGLÉS**:
 1. **headline**: Titular claro y atractivo (máx 12-15 palabras).
 2. **what_happened**: 1 frase concisa con el hecho/dato objetivo.
-3. **why_it_matters**: 1-2 frases explicando la implicación práctica para rankings, visibilidad en IA, tráfico o estrategia SEO/GEO.
+3. **why_it_matters**: 1-2 frases explicando la implicación práctica para rankings, visibilidad en IA, tráfico, analítica o campañas de pago.
 4. **category**: Asigna una de las siguientes categorías exactas:
-   - 'google-updates' (cambios de algoritmo, Search Console, políticas de Google)
+   - 'google-updates' (cambios de algoritmo orgánico, Search Console, políticas de Google)
    - 'ai-search' (ChatGPT Search, AI Overviews, LLMs, Perplexity, citaciones IA)
    - 'technical-seo' (Schema, rastreo, indexación, Core Web Vitals, arquitectura web)
    - 'seo-strategy' (estudios de datos, presupuestos, link building, contenido)
-   - 'local-ecommerce' (Google Maps, Merchant Center, comercio local)
+   - 'local-ecommerce' (Google Maps, Merchant Center orgánico, comercio local)
+   - 'data-analytics' (GA4, Google Tag Manager, server-side tracking, atribución, privacidad, consent mode)
+   - 'paid-media' (Google Ads, Meta Ads, Paid Social, Smart Bidding, Performance Max, formatos publicitarios, APIs de anuncios)
 
 Responde ÚNICAMENTE con un JSON con esta estructura exacta:
 {
